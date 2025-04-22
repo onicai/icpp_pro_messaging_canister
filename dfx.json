@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "canisters": {
+    "messaging": {
+      "type": "custom",
+      "candid": "build/messaging.did",
+      "wasm": "build/messaging.wasm"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  }
+}

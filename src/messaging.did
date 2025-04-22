@@ -1,0 +1,24 @@
+type StatusCode = nat16;
+type ApiError = variant {
+  Other : text;
+  StatusCode : nat16;
+};
+type StatusCodeRecord = record { status_code : nat16 };
+type StatusCodeRecordResult = variant {
+  Err : ApiError;
+  Ok : StatusCodeRecord;
+};
+// -----------------------------------------------------
+type MessageRecord = record {
+  message : text;
+};
+type MessageRecordResult = variant {
+  Err : ApiError;
+  Ok : MessageRecord;
+};
+
+service : {
+  health : () -> (StatusCodeRecordResult) query;
+  set_message : (MessageRecord) -> (MessageRecordResult);
+  get_message : () -> (MessageRecordResult) query;
+};
