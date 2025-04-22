@@ -1,4 +1,5 @@
 [![icpp_pro_messaging_canister](https://github.com/onicai/icpp_pro_messaging_canister/actions/workflows/cicd-mac.yml/badge.svg)](https://github.com/onicai/icpp_pro_messaging_canister/actions/workflows/cicd-mac.yml)
+[![icpp_pro_messaging_canister](https://github.com/onicai/icpp_pro_messaging_canister/actions/workflows/cicd-ubuntu.yml/badge.svg)](https://github.com/onicai/icpp_pro_messaging_canister/actions/workflows/cicd-ubuntu.yml)
 
 # icpp-pro Messaging Canister
 

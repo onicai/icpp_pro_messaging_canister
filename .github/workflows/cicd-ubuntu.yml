@@ -1,90 +1,90 @@
-# name: cicd-ubuntu
+name: cicd-ubuntu
 
-# on:
-#   workflow_dispatch:
-#   push:
-#     paths:
-#       - "src/**"
-#       - "test/**"
-#       - "Makefile"
-#       - ".github/trigger.txt"
-#       - ".github/workflows/cicd-ubuntu.yml"
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "src/**"
+      - "test/**"
+      - "Makefile"
+      - ".github/trigger.txt"
+      - ".github/workflows/cicd-ubuntu.yml"
 
-# jobs:
-#   all-ubuntu:
-#     name: all-ubuntu
-#     strategy:
-#       matrix:
-#         python-version: [3.9, 3.11]
-#         os: [ubuntu-latest]
+jobs:
+  all-ubuntu:
+    name: all-ubuntu
+    strategy:
+      matrix:
+        python-version: [3.9, 3.11]
+        os: [ubuntu-latest]
 
-#     runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     
-#     steps:
-#       # https://github.com/marketplace/actions/setup-miniconda
-#       - uses: conda-incubator/setup-miniconda@v3
-#         with:
-#           python-version: ${{ matrix.python-version }}
+    steps:
+      # https://github.com/marketplace/actions/setup-miniconda
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          python-version: ${{ matrix.python-version }}
 
-#       # -------------------------------------------------------------------
-#       # Checkout icpp-pro & icpp-candid as nested directory
-#       - name: checkout icpp-pro
-#         uses: actions/checkout@v4
-#         with:
-#           fetch-depth: 0
+      # -------------------------------------------------------------------
+      # Checkout the repo
+      - name: checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # -------------------------------------------------------------------
 
-#       - name: checkout icpp-candid
-#         uses: actions/checkout@v4
-#         with:
-#           repository: icppWorld/icpp-candid
-#           path: icpp-candid
-#           fetch-depth: 0
-#       # -------------------------------------------------------------------
+      - name: install
+        shell: bash -l {0} # activates the default conda environment ('test')
+        run: |
+          echo "Installing tool chains & dependencies"
+          pwd
+          sudo apt-get update
+          sudo apt-get install build-essential
+          make summary
+          make install-dfx
+          make install-python
+          make install-clang-ubuntu
+          make install-jp-ubuntu
 
-#       - name: install
-#         shell: bash -l {0} # activates the default conda environment ('test')
-#         run: |
-#           echo "Installing tool chains & dependencies"
-#           pwd
-#           sudo apt-get update
-#           sudo apt-get install build-essential
-#           make summary
-#           make install-dfx
-#           make install-python
-#           make install-clang-ubuntu
-#           make install-jp-ubuntu
+      - name: versions
+        shell: bash -l {0}
+        run: |
+          echo "icpp --version: $(icpp --version)"
+          echo "clang++ --version: $(clang++ --version)"
+          echo "g++ --version: $(g++ --version)"
+          #echo "wasm2wat version: $(wasm2wat --version)"
+          echo "pip version     : $(pip --version)"
+          echo "python version  : $(python --version)"
+          echo "jp version      : $(jp --version)"
+          #echo "rustc version   : $(rustc --version)"
+          echo "dfx version    : $(dfx --version)"
+          echo "Ensure conda works properly"
+          conda info
+          which pip
+          which python
+          which icpp
 
-#       - name: versions
-#         shell: bash -l {0}
-#         run: |
-#           echo "icpp --version: $(icpp --version)"
-#           echo "clang++ --version: $(clang++ --version)"
-#           echo "g++ --version: $(g++ --version)"
-#           #echo "wasm2wat version: $(wasm2wat --version)"
-#           echo "pip version     : $(pip --version)"
-#           echo "python version  : $(python --version)"
-#           echo "jp version      : $(jp --version)"
-#           #echo "rustc version   : $(rustc --version)"
-#           echo "dfx version    : $(dfx --version)"
-#           echo "Ensure conda works properly"
-#           conda info
-#           which pip
-#           which python
-#           which icpp
+      - name: Create icpp-qa identity
+        shell: bash -l {0}
+        run: |
+          dfx identity new icpp-qa --storage-mode=plaintext
+          dfx identity use icpp-qa
 
-#       - name: install-wasi-sdk
-#         shell: bash -l {0}
-#         run: |
-#           echo "Installing wasi-sdk"
-#           icpp install-wasi-sdk
+      - name: install-wasi-sdk
+        shell: bash -l {0}
+        run: |
+          echo "Installing wasi-sdk"
+          icpp install-wasi-sdk
 
-#       - name: install-rust
-#         shell: bash -l {0}
-#         run: |
-#           echo "Installing rust"
-#           icpp install-rust
+      - name: install-rust
+        shell: bash -l {0}
+        run: |
+          echo "Installing rust"
+          icpp install-rust
 
-#       - name: all-tests
-#         shell: bash -l {0}
-#         run: |
-#           make all-tests
+      - name: all-tests
+        shell: bash -l {0}
+        run: |
+          dfx identity use icpp-qa
+          make all-tests
